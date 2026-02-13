@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mayagen.ai — Team Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0f1117; --surface: #1a1d27; --surface2: #242836; --surface3: #2e3348;
+    --border: #353a4f; --text: #e4e6f0; --text2: #9ca3bf; --text3: #6b7394;
+    --accent: #7c5cfc; --accent2: #5b3fd9; --green: #34d399; --yellow: #fbbf24;
+    --orange: #fb923c; --red: #f87171; --blue: #60a5fa; --pink: #f472b6;
+    --cyan: #22d3ee;
+  }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+  
+  /* Layout */
+  .app { display: flex; height: 100vh; }
+  .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+  .main { flex: 1; overflow-y: auto; }
+  
+  /* Sidebar */
+  .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); }
+  .sidebar-header h1 { font-size: 18px; font-weight: 700; }
+  .sidebar-header p { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .nav-section { padding: 12px 0; }
+  .nav-label { padding: 4px 20px; font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text3); font-weight: 600; }
+  .nav-item { padding: 8px 20px; font-size: 13px; color: var(--text2); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all .15s; }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: var(--accent2); color: #fff; }
+  .nav-item .badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 10px; padding: 1px 7px; border-radius: 10px; font-weight: 600; }
+  
+  /* Team Status */
+  .team-list { padding: 12px; border-top: 1px solid var(--border); margin-top: auto; }
+  .team-list h3 { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); padding: 0 8px 8px; }
+  .team-member { display: flex; align-items: center; gap: 8px; padding: 5px 8px; font-size: 12px; border-radius: 6px; }
+  .team-member:hover { background: var(--surface2); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot.online { background: var(--green); }
+  .dot.idle { background: var(--yellow); }
+  .dot.done { background: var(--blue); }
+  
+  /* Header */
+  .header { padding: 20px 32px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--surface); }
+  .header h2 { font-size: 20px; font-weight: 700; }
+  .header-actions { display: flex; gap: 10px; }
+  .btn { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-size: 13px; cursor: pointer; transition: all .15s; }
+  .btn:hover { background: var(--surface3); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: var(--accent2); }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 0; padding: 0 32px; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .tab { padding: 12px 20px; font-size: 13px; color: var(--text2); cursor: pointer; border-bottom: 2px solid transparent; transition: all .15s; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-color: var(--accent); font-weight: 600; }
+
+  /* Content */
+  .content { padding: 24px 32px; }
+  
+  /* Stats Grid */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .stat-card .label { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+  .stat-card .value { font-size: 28px; font-weight: 700; }
+  .stat-card .change { font-size: 12px; margin-top: 4px; }
+  .stat-card .change.up { color: var(--green); }
+  .stat-card .change.down { color: var(--red); }
+  .stat-card .change.neutral { color: var(--text3); }
+
+  /* Kanban Board */
+  .kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .kanban-col { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; min-height: 400px; }
+  .kanban-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .kanban-header h3 { font-size: 14px; font-weight: 600; }
+  .kanban-count { background: var(--surface3); font-size: 11px; padding: 2px 8px; border-radius: 10px; color: var(--text2); }
+  .kanban-cards { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; cursor: pointer; transition: all .15s; }
+  .card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .card-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .card-desc { font-size: 11px; color: var(--text2); margin-bottom: 8px; }
+  .card-meta { display: flex; align-items: center; justify-content: space-between; }
+  .card-tag { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+  .tag-seo { background: #7c5cfc22; color: var(--accent); }
+  .tag-frontend { background: #60a5fa22; color: var(--blue); }
+  .tag-content { background: #34d39922; color: var(--green); }
+  .tag-product { background: #fbbf2422; color: var(--yellow); }
+  .tag-devops { background: #fb923c22; color: var(--orange); }
+  .tag-growth { background: #f472b622; color: var(--pink); }
+  .card-agent { font-size: 10px; color: var(--text3); }
+  .card-priority { font-size: 10px; font-weight: 700; }
+  .p0 { color: var(--red); }
+  .p1 { color: var(--orange); }
+  .p2 { color: var(--yellow); }
+
+  /* Chat / Activity */
+  .two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .panel-header { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .panel-body { padding: 16px; max-height: 500px; overflow-y: auto; }
+  
+  /* Chat Messages */
+  .chat-msg { margin-bottom: 16px; }
+  .chat-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .chat-name { font-size: 13px; font-weight: 600; }
+  .chat-role { font-size: 10px; padding: 1px 6px; border-radius: 4px; }
+  .chat-time { font-size: 10px; color: var(--text3); margin-left: auto; }
+  .chat-text { font-size: 13px; color: var(--text2); line-height: 1.6; padding-left: 0; }
+  .chat-text code { background: var(--surface3); padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+  
+  /* Agent Summary Cards */
+  .summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+  .summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .summary-card-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .summary-card-header .icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .summary-card-header h4 { font-size: 14px; font-weight: 600; }
+  .summary-card-header .status { margin-left: auto; font-size: 11px; padding: 3px 10px; border-radius: 12px; font-weight: 600; }
+  .status-done { background: #34d39922; color: var(--green); }
+  .status-running { background: #fbbf2422; color: var(--yellow); }
+  .summary-card-body { padding: 16px; }
+  .summary-card-body ul { list-style: none; }
+  .summary-card-body li { font-size: 12px; color: var(--text2); padding: 4px 0; padding-left: 16px; position: relative; }
+  .summary-card-body li::before { content: '→'; position: absolute; left: 0; color: var(--text3); }
+  .summary-card-body .highlight { color: var(--text); font-weight: 600; }
+  
+  /* Findings */
+  .finding { padding: 12px; background: var(--surface2); border-radius: 8px; margin-bottom: 10px; border-left: 3px solid var(--accent); }
+  .finding.critical { border-left-color: var(--red); }
+  .finding.warning { border-left-color: var(--yellow); }
+  .finding.success { border-left-color: var(--green); }
+  .finding .finding-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .finding .finding-text { font-size: 12px; color: var(--text2); }
+
+  /* Timeline */
+  .timeline-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .timeline-item:last-child { border: none; }
+  .timeline-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .timeline-content { flex: 1; }
+  .timeline-content .title { font-size: 13px; font-weight: 500; }
+  .timeline-content .time { font-size: 11px; color: var(--text3); }
+  .timeline-content .detail { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+  /* Responsive */
+  @media (max-width: 1200px) { .kanban { grid-template-columns: repeat(2, 1fr); } .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 768px) { .sidebar { display: none; } .kanban { grid-template-columns: 1fr; } .two-col { grid-template-columns: 1fr; } .stats-grid { grid-template-columns: 1fr; } .summary-grid { grid-template-columns: 1fr; } }
+
+  /* Section Headings */
+  .section-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .section-title span { color: var(--text3); font-size: 13px; font-weight: 400; }
+
+  /* Hidden sections */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Task Detail Modal */
+  .task-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000; }
+  .task-modal-backdrop.active { display: flex; }
+  .task-modal { width: 720px; max-width: 95vw; max-height: 80vh; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; overflow: hidden; }
+  .task-modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .task-modal-title { font-size: 14px; font-weight: 600; }
+  .task-modal-subtitle { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .task-modal-close { border: none; background: transparent; color: var(--text3); font-size: 18px; cursor: pointer; padding: 0 4px; }
+  .task-modal-body { padding: 16px 20px; overflow-y: auto; font-size: 12px; color: var(--text2); }
+  .task-meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .task-pill { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--surface2); border: 1px solid var(--border); color: var(--text2); }
+  .task-section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-top: 12px; margin-bottom: 4px; }
+  .task-checklist { list-style: none; padding-left: 0; margin: 4px 0 0; }
+  .task-checklist li { padding: 2px 0 2px 18px; position: relative; }
+  .task-checklist li::before { content: '\2713'; position: absolute; left: 0; font-size: 10px; color: var(--green); }
+  .task-checklist li.todo::before { content: '\2022'; color: var(--text3); }
+  .task-links { margin-top: 4px; }
+  .task-links a { color: var(--cyan); text-decoration: none; font-size: 11px; }
+  .task-links a + span { margin: 0 4px; color: var(--text3); font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h1>💎 Mayagen HQ</h1>
+      <p>Vision • Team Coordinator</p>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Dashboard</div>
+      <div class="nav-item active" onclick="switchTab('overview')">📊 Overview</div>
+      <div class="nav-item" onclick="switchTab('board')">📋 Task Board</div>
+      <div class="nav-item" onclick="switchTab('agents')">🤖 Agent Reports</div>
+      <div class="nav-item" onclick="switchTab('chat')">💬 Team Chat</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Reports</div>
+      <div class="nav-item" onclick="switchTab('seo')">🔍 SEO Audit <span class="badge">Done</span></div>
+      <div class="nav-item" onclick="switchTab('frontend')">💻 Frontend Audit <span class="badge">Done</span></div>
+      <div class="nav-item" onclick="switchTab('content-report')">✍️ Content Strategy <span class="badge">Done</span></div>
+      <div class="nav-item" onclick="switchTab('product-report')">📊 Product Strategy <span class="badge">Done</span></div>
+    </div>
+    <div class="team-list">
+      <h3>Team Status</h3>
+      <div class="team-member"><span class="dot done"></span> SEO Specialist</div>
+      <div class="team-member"><span class="dot done"></span> Content Marketer</div>
+      <div class="team-member"><span class="dot done"></span> Frontend Dev</div>
+      <div class="team-member"><span class="dot done"></span> Product Manager</div>
+      <div class="team-member"><span class="dot idle"></span> DevOps Engineer</div>
+      <div class="team-member"><span class="dot idle"></span> Social Media Mgr</div>
+      <div class="team-member"><span class="dot idle"></span> Growth Hacker</div>
+      <div class="team-member"><span class="dot idle"></span> Community Mgr</div>
+      <div class="team-member"><span class="dot idle"></span> Analytics Lead</div>
+      <div class="team-member"><span class="dot online"></span> Vision (Coordinator)</div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="header">
+      <h2>Mayagen.ai Team Dashboard</h2>
+      <div class="header-actions">
+        <span style="font-size:12px;color:var(--text3);padding:8px;">Feb 12, 2026 • Day 1</span>
+        <button class="btn">Export Reports</button>
+        <button class="btn primary">+ Spawn Agent</button>
+      </div>
+    </div>
+
+    <!-- OVERVIEW TAB -->
+    <div id="tab-overview" class="tab-content active">
+      <div class="content">
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="label">Agents Deployed</div>
+            <div class="value">4 <span style="font-size:14px;color:var(--text3)">/ 14</span></div>
+            <div class="change neutral">Phase 1 complete</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Tasks Completed</div>
+            <div class="value" style="color:var(--green)">4</div>
+            <div class="change up">↑ All Phase 1 reports done</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Critical Issues Found</div>
+            <div class="value" style="color:var(--red)">5</div>
+            <div class="change down">#1: No SSR — invisible to Google</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">MRR Target (12mo)</div>
+            <div class="value" style="color:var(--cyan)">$70K</div>
+            <div class="change neutral">100K users @ 5% conversion</div>
+          </div>
+        </div>
+
+        <!-- Key Findings -->
+        <div class="section-title">🚨 Critical Findings <span>Consensus across all agents</span></div>
+        <div style="margin-bottom:24px">
+          <div class="finding critical">
+            <div class="finding-title">1. Site Invisible to Search Engines</div>
+            <div class="finding-text">React SPA with no SSR — Google sees empty &lt;div id="root"&gt;. All 91 routes are unindexable. This is the #1 blocker for growth.</div>
+          </div>
+          <div class="finding critical">
+            <div class="finding-title">2. 2.47 MB JavaScript Bundle</div>
+            <div class="finding-text">Single monolithic bundle with zero code splitting. Estimated 6-12 second mobile load time. Immediate 60-80% reduction possible with React.lazy().</div>
+          </div>
+          <div class="finding critical">
+            <div class="finding-title">3. Missing SEO Infrastructure</div>
+            <div class="finding-text">No robots.txt, no sitemap.xml, no OG tags, no structured data. 307 redirect instead of 301. SEO score: ~15/100.</div>
+          </div>
+          <div class="finding warning">
+            <div class="finding-title">4. No Video Generation</div>
+            <div class="finding-text">Table-stakes feature in 2026. Competitors (Canva, Adobe, Leonardo) all offer it. Critical gap for Phase 2.</div>
+          </div>
+          <div class="finding success">
+            <div class="finding-title">5. Strong Feature Set (Untapped)</div>
+            <div class="finding-text">Meme generator + logo creator + content scheduler + community gallery = unique combination. Once discoverable, this is a real differentiator.</div>
+          </div>
+        </div>
+
+        <!-- Recommended Action Plan -->
+        <div class="section-title">🎯 Top Priority Actions</div>
+        <div class="kanban" style="grid-template-columns: repeat(3,1fr); margin-bottom:24px;">
+          <div class="kanban-col">
+            <div class="kanban-header"><h3 style="color:var(--red)">🔴 This Week</h3></div>
+            <div class="kanban-cards">
+              <div class="card"><div class="card-title">Migrate to Next.js</div><div class="card-desc">Enables SSR, code splitting, SEO — all at once. Already on Vercel.</div><div class="card-meta"><span class="card-tag tag-frontend">Frontend</span><span class="card-priority p0">P0</span></div></div>
+              <div class="card"><div class="card-title">Add robots.txt + sitemap.xml</div><div class="card-desc">Stop crawler confusion. Enable proper indexing.</div><div class="card-meta"><span class="card-tag tag-seo">SEO</span><span class="card-priority p0">P0</span></div></div>
+              <div class="card"><div class="card-title">Add OG + Twitter Card tags</div><div class="card-desc">Enable social sharing previews.</div><div class="card-meta"><span class="card-tag tag-seo">SEO</span><span class="card-priority p0">P0</span></div></div>
+            </div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-header"><h3 style="color:var(--orange)">🟠 This Month</h3></div>
+            <div class="kanban-cards">
+              <div class="card"><div class="card-title">SEO Landing Pages per Tool</div><div class="card-desc">/ai-meme-generator, /ai-logo-creator etc. — massive organic potential</div><div class="card-meta"><span class="card-tag tag-seo">SEO</span><span class="card-priority p1">P1</span></div></div>
+              <div class="card"><div class="card-title">Launch Blog + Content Calendar</div><div class="card-desc">30 posts planned for 12 weeks. Start publishing.</div><div class="card-meta"><span class="card-tag tag-content">Content</span><span class="card-priority p1">P1</span></div></div>
+              <div class="card"><div class="card-title">Formalize Pricing Tiers</div><div class="card-desc">Free / $9 / $19 / $29 per seat, credit-based.</div><div class="card-meta"><span class="card-tag tag-product">Product</span><span class="card-priority p1">P1</span></div></div>
+            </div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-header"><h3 style="color:var(--yellow)">🟡 This Quarter</h3></div>
+            <div class="kanban-cards">
+              <div class="card"><div class="card-title">Video Generation Feature</div><div class="card-desc">Table-stakes in 2026. Major competitive gap.</div><div class="card-meta"><span class="card-tag tag-product">Product</span><span class="card-priority p1">P1</span></div></div>
+              <div class="card"><div class="card-title">Product Hunt Launch</div><div class="card-desc">Time with video launch for maximum impact.</div><div class="card-meta"><span class="card-tag tag-growth">Growth</span><span class="card-priority p2">P2</span></div></div>
+              <div class="card"><div class="card-title">Mobile Apps (iOS + Android)</div><div class="card-desc">Capture mobile-first creator audience.</div><div class="card-meta"><span class="card-tag tag-product">Product</span><span class="card-priority p2">P2</span></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Competitive Position -->
+        <div class="section-title">🏆 Competitive Position</div>
+        <div class="panel" style="margin-bottom:24px">
+          <div class="panel-body" style="overflow-x:auto">
+            <table style="width:100%;font-size:12px;border-collapse:collapse;">
+              <thead>
+                <tr style="border-bottom:1px solid var(--border);">
+                  <th style="text-align:left;padding:8px;color:var(--text2)">Feature</th>
+                  <th style="padding:8px;color:var(--accent)">Mayagen</th>
+                  <th style="padding:8px;color:var(--text2)">Canva</th>
+                  <th style="padding:8px;color:var(--text2)">Midjourney</th>
+                  <th style="padding:8px;color:var(--text2)">DALL-E</th>
+                  <th style="padding:8px;color:var(--text2)">Leonardo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">Text-to-Image</td><td style="text-align:center;padding:8px">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">Logo Design</td><td style="text-align:center;padding:8px">✅</td><td style="text-align:center">✅</td><td style="text-align:center">❌</td><td style="text-align:center">❌</td><td style="text-align:center">❌</td></tr>
+                <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">Meme Generator</td><td style="text-align:center;padding:8px">✅</td><td style="text-align:center">✅</td><td style="text-align:center">❌</td><td style="text-align:center">❌</td><td style="text-align:center">❌</td></tr>
+                <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">Content Scheduler</td><td style="text-align:center;padding:8px">✅</td><td style="text-align:center">✅</td><td style="text-align:center">❌</td><td style="text-align:center">❌</td><td style="text-align:center">❌</td></tr>
+                <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">Community Gallery</td><td style="text-align:center;padding:8px">✅</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td><td style="text-align:center">❌</td><td style="text-align:center">✅</td></tr>
+                <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">Brand Kit</td><td style="text-align:center;padding:8px">✅</td><td style="text-align:center">✅</td><td style="text-align:center">❌</td><td style="text-align:center">❌</td><td style="text-align:center">❌</td></tr>
+                <tr style="border-bottom:1px solid var(--border);color:var(--red)"><td style="padding:8px">Video Generation</td><td style="text-align:center;padding:8px">❌</td><td style="text-align:center">✅</td><td style="text-align:center">❌</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr style="border-bottom:1px solid var(--border);color:var(--red)"><td style="padding:8px">Mobile App</td><td style="text-align:center;padding:8px">❌</td><td style="text-align:center">✅</td><td style="text-align:center">❌</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+                <tr><td style="padding:8px">Bulk Designer</td><td style="text-align:center;padding:8px">✅</td><td style="text-align:center">✅</td><td style="text-align:center">❌</td><td style="text-align:center">❌</td><td style="text-align:center">❌</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Phase 2 Summary -->
+        <div class="section-title" style="margin-top:24px">📦 Phase 2 Status <span>All four advanced agents completed</span></div>
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px">
+          <div class="stat-card"><div class="label">DevOps Plan</div><div class="value" style="font-size:18px;color:var(--green)">Done</div><div class="change neutral">Next.js migration + CI/CD</div></div>
+          <div class="stat-card"><div class="label">Social Launch</div><div class="value" style="font-size:18px;color:var(--green)">Done</div><div class="change neutral">"Faster, Better, Mayagen" campaign</div></div>
+          <div class="stat-card"><div class="label">Growth Strategy</div><div class="value" style="font-size:18px;color:var(--green)">Done</div><div class="change neutral">Acquisition funnel + viral loop</div></div>
+          <div class="stat-card"><div class="label">Analytics Plan</div><div class="value" style="font-size:18px;color:var(--green)">Done</div><div class="change neutral">PostHog tracking + KPIs</div></div>
+        </div>
+
+        <!-- Revenue / KPIs -->
+        <div class="section-title">📈 Target KPIs (Month 12)</div>
+        <div class="stats-grid" style="grid-template-columns:repeat(5,1fr)">
+          <div class="stat-card"><div class="label">MAU</div><div class="value" style="font-size:22px">100K</div></div>
+          <div class="stat-card"><div class="label">Organic Traffic</div><div class="value" style="font-size:22px">200K</div><div class="change neutral">/month</div></div>
+          <div class="stat-card"><div class="label">Paid Conversion</div><div class="value" style="font-size:22px">5%</div></div>
+          <div class="stat-card"><div class="label">ARPU</div><div class="value" style="font-size:22px">$14</div><div class="change neutral">/month</div></div>
+          <div class="stat-card"><div class="label">Day 30 Retention</div><div class="value" style="font-size:22px">20%</div></div>
+        </div>
+
+        <!-- User Personas -->
+        <div class="section-title" style="margin-top:24px">👥 Target Personas</div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="label">Social Sara</div>
+            <div style="font-size:13px;color:var(--text2);margin-top:8px">Content creator, 22-32. Needs high-volume visual content. Pays $8-15/mo.</div>
+            <div style="margin-top:8px"><span class="card-tag tag-content" style="font-size:11px">Memes • Templates • Scheduler</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Startup Steve</div>
+            <div style="font-size:13px;color:var(--text2);margin-top:8px">Solopreneur, 28-45. Needs pro branding without a designer. Pays $15-30/mo.</div>
+            <div style="margin-top:8px"><span class="card-tag tag-product" style="font-size:11px">Logos • Brand Kit • Mockups</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Agency Alex</div>
+            <div style="font-size:13px;color:var(--text2);margin-top:8px">Agency lead, 25-40. Manages multiple brands. Pays $30-60/seat/mo.</div>
+            <div style="margin-top:8px"><span class="card-tag tag-growth" style="font-size:11px">Teams • Bulk • Multi-brand</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Memetic Mike</div>
+            <div style="font-size:13px;color:var(--text2);margin-top:8px">Meme creator, 18-30. Wants viral content fast. Free tier → viral growth.</div>
+            <div style="margin-top:8px"><span class="card-tag tag-seo" style="font-size:11px">Memes • Gallery • Trending</span></div>
+          </div>
+        </div>
+
+        <!-- Pricing -->
+        <div class="section-title" style="margin-top:24px">💰 Recommended Pricing</div>
+        <div class="stats-grid">
+          <div class="stat-card" style="border-top:3px solid var(--text3)">
+            <div class="label">Free</div>
+            <div class="value">$0</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:8px">50 credits/day<br>Watermarked exports<br>Basic templates<br>Community access</div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--blue)">
+            <div class="label">Creator</div>
+            <div class="value">$9<span style="font-size:14px;color:var(--text3)">/mo</span></div>
+            <div style="font-size:12px;color:var(--text2);margin-top:8px">500 credits/mo<br>No watermark<br>Scheduler (3 accounts)<br>HD export</div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--accent)">
+            <div class="label">Pro</div>
+            <div class="value">$19<span style="font-size:14px;color:var(--text3)">/mo</span></div>
+            <div style="font-size:12px;color:var(--text2);margin-top:8px">2,000 credits/mo<br>Brand kit (1 brand)<br>Bulk designer<br>Analytics</div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--green)">
+            <div class="label">Teams</div>
+            <div class="value">$29<span style="font-size:14px;color:var(--text3)">/seat</span></div>
+            <div style="font-size:12px;color:var(--text2);margin-top:8px">5,000 credits/seat<br>Multi-brand (5)<br>Approval workflows<br>API access</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOARD TAB -->
+    <div id="tab-board" class="tab-content">
+      <div class="content">
+        <div class="section-title">📋 Task Board</div>
+        <div class="kanban">
+          <!-- In Progress -->
+          <div class="kanban-col">
+            <div class="kanban-header"><h3>🔄 In Progress</h3><span class="kanban-count">2</span></div>
+            <div class="kanban-cards">
+              <div class="card" onclick="openTaskModal('task-001')">
+                <div class="card-title">Optimize Meme Generator Landing Page</div>
+                <div class="card-desc">Improve /meme-generator conversions and make the flow clear: generate meme → use in social post → planner → scheduler → signup.</div>
+                <div class="card-meta">
+                  <span class="card-tag tag-seo">@seo-growth</span>
+                  <span class="card-tag tag-content">@content-lead</span>
+                </div>
+                <div style="margin-top:6px;font-size:11px;">
+                  <a href="../reports/meme-generator-landing-copy-v2.md" target="_blank" style="color:var(--cyan);text-decoration:none;" onclick="event.stopPropagation()">Copy v2</a>
+                  &nbsp;•&nbsp;
+                  <a href="../reports/meme-generator-landing-seo-structure-v1.md" target="_blank" style="color:var(--cyan);text-decoration:none;" onclick="event.stopPropagation()">SEO structure</a>
+                </div>
+              </div>
+              <div class="card" onclick="openTaskModal('task-002')">
+                <div class="card-title">Update Logo Maker as Suite Flagship</div>
+                <div class="card-desc">Position Logo Maker as the starting point: new logo → brand kit → templates → scheduled launch posts.</div>
+                <div class="card-meta">
+                  <span class="card-tag tag-product">@product-ux</span>
+                  <span class="card-tag tag-content">@content-lead</span>
+                </div>
+                <div style="margin-top:6px;font-size:11px;">
+                  <a href="../reports/logo-maker-landing-ux-v1.md" target="_blank" style="color:var(--cyan);text-decoration:none;" onclick="event.stopPropagation()">UX v1</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- To Do -->
+          <div class="kanban-col">
+            <div class="kanban-header"><h3>📝 To Do</h3><span class="kanban-count">3</span></div>
+            <div class="kanban-cards">
+              <div class="card" onclick="openTaskModal('task-003')">
+                <div class="card-title">Product Mockups Flow</div>
+                <div class="card-desc">Clarify mockup → ad template → scheduled campaign flow for ecommerce & SaaS.</div>
+                <div class="card-meta"><span class="card-tag tag-product">@product-ux</span><span class="card-tag tag-seo">@seo-growth</span></div>
+              </div>
+              <div class="card">
+                <div class="card-title">Define North Star Dashboards</div>
+                <div class="card-desc">Turn Analytics v2 north stars into concrete PostHog dashboards for SK.</div>
+                <div class="card-meta"><span class="card-tag tag-growth">@analytics</span><span class="card-tag tag-product">@product-ux</span></div>
+              </div>
+              <div class="card" onclick="openTaskModal('task-005')">
+                <div class="card-title">Weekly Content Pack Experiment</div>
+                <div class="card-desc">Design and test weekly auto-generated content packs (memes + posts + mockups) to drive retention and referrals.</div>
+                <div class="card-meta"><span class="card-tag tag-growth">@growth</span><span class="card-tag tag-content">@content-lead</span></div>
+              </div>
+            </div>
+          </div>
+          <!-- Review -->
+          <div class="kanban-col">
+            <div class="kanban-header"><h3>👀 Review</h3><span class="kanban-count">0</span></div>
+            <div class="kanban-cards">
+              <div style="padding:20px;text-align:center;color:var(--text3);font-size:12px;">Nothing awaiting review yet</div>
+            </div>
+          </div>
+          <!-- Done -->
+          <div class="kanban-col">
+            <div class="kanban-header"><h3>✅ Done</h3><span class="kanban-count">4</span></div>
+            <div class="kanban-cards">
+              <div class="card" style="border-left:3px solid var(--green)"><div class="card-title">SEO Audit</div><div class="card-desc">Full audit: score 15/100, 15 action items prioritized</div><div class="card-meta"><span class="card-tag tag-seo">team-seo</span></div></div>
+              <div class="card" style="border-left:3px solid var(--green)"><div class="card-title">Content Strategy</div><div class="card-desc">3-month calendar, 30 posts, social plan, email sequences</div><div class="card-meta"><span class="card-tag tag-content">team-content</span></div></div>
+              <div class="card" style="border-left:3px solid var(--green)"><div class="card-title">Frontend Audit</div><div class="card-desc">Tech stack, bundle analysis, perf issues, migration path</div><div class="card-meta"><span class="card-tag tag-frontend">team-frontend</span></div></div>
+              <div class="card" style="border-left:3px solid var(--green)"><div class="card-title">Product Strategy</div><div class="card-desc">Competitive analysis, personas, roadmap, pricing model</div><div class="card-meta"><span class="card-tag tag-product">team-product</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AGENTS TAB -->
+    <div id="tab-agents" class="tab-content">
+      <div class="content">
+        <div class="section-title">🤖 Agent Reports & Summaries</div>
+        <div class="summary-grid">
+          <!-- SEO Agent -->
+          <div class="summary-card">
+            <div class="summary-card-header">
+              <div class="icon" style="background:#7c5cfc22;">🔍</div>
+              <div><h4>SEO Specialist</h4><div style="font-size:11px;color:var(--text3)">team-seo • Completed in 1m48s</div></div>
+              <span class="status status-done">✅ Done</span>
+            </div>
+            <div class="summary-card-body">
+              <ul>
+                <li><span class="highlight">SEO Score: 15/100 (Severe)</span></li>
+                <li>Site is a client-side SPA — crawlers see empty div</li>
+                <li>No robots.txt, sitemap.xml, or OG tags</li>
+                <li>307 redirect instead of 301</li>
+                <li>No structured data / JSON-LD</li>
+                <li>Target keywords: "AI meme generator" (80K/mo), "AI logo generator" (100K/mo)</li>
+                <li>15 prioritized action items across P0-P3</li>
+                <li><span class="highlight">Top rec: Migrate to Next.js for SSR</span></li>
+              </ul>
+            </div>
+          </div>
+          <!-- Frontend Agent -->
+          <div class="summary-card">
+            <div class="summary-card-header">
+              <div class="icon" style="background:#60a5fa22;">💻</div>
+              <div><h4>Frontend Developer</h4><div style="font-size:11px;color:var(--text3)">team-frontend • Completed in 2m40s</div></div>
+              <span class="status status-done">✅ Done</span>
+            </div>
+            <div class="summary-card-body">
+              <ul>
+                <li><span class="highlight">Stack: React CRA + Redux + Tailwind + Vercel</span></li>
+                <li>Single 2.47 MB JS bundle — zero code splitting</li>
+                <li>91 routes all client-rendered</li>
+                <li>Estimated 6-12s mobile load time</li>
+                <li>Google Fonts loaded via CSS @import (render-blocking)</li>
+                <li>No preconnect/prefetch hints</li>
+                <li>~30 free tool routes = untapped SEO goldmine</li>
+                <li><span class="highlight">Top rec: Code splitting + Next.js migration</span></li>
+              </ul>
+            </div>
+          </div>
+          <!-- Content Agent -->
+          <div class="summary-card">
+            <div class="summary-card-header">
+              <div class="icon" style="background:#34d39922;">✍️</div>
+              <div><h4>Content Marketer</h4><div style="font-size:11px;color:var(--text3)">team-content • Completed in 2m27s</div></div>
+              <span class="status status-done">✅ Done</span>
+            </div>
+            <div class="summary-card-body">
+              <ul>
+                <li><span class="highlight">5 content pillars defined</span></li>
+                <li>30 blog posts planned across 12 weeks</li>
+                <li>Social plans: Twitter (5-7/wk), LinkedIn (3-4/wk), Instagram (4-5/wk)</li>
+                <li>14 tutorial ideas (beginner → advanced)</li>
+                <li>7-email onboarding sequence + re-engagement + upgrade flows</li>
+                <li>3 production-ready blog post outlines</li>
+                <li>Content repurposing flywheel: Blog → Thread → Post → Reel → Email</li>
+                <li><span class="highlight">Month 3 target: 25K blog sessions, 3K subscribers</span></li>
+              </ul>
+            </div>
+          </div>
+          <!-- Product Agent -->
+          <div class="summary-card">
+            <div class="summary-card-header">
+              <div class="icon" style="background:#fbbf2422;">📊</div>
+              <div><h4>Product Manager</h4><div style="font-size:11px;color:var(--text3)">team-product • Completed in 3m22s</div></div>
+              <span class="status status-done">✅ Done</span>
+            </div>
+            <div class="summary-card-body">
+              <ul>
+                <li><span class="highlight">Broad feature set is the differentiator</span></li>
+                <li>Competitive position: "Accessible + Broad" (affordable Canva alternative)</li>
+                <li>4 user personas: Social Sara, Startup Steve, Agency Alex, Memetic Mike</li>
+                <li>3-phase roadmap: Fix (1-3mo) → Differentiate (4-6mo) → Scale (7-12mo)</li>
+                <li>Pricing: Free / $9 / $19 / $29 per seat (credit-based)</li>
+                <li>Video generation = critical gap for Phase 2</li>
+                <li>Free tools as SEO acquisition engine</li>
+                <li><span class="highlight">MRR target: $70K by month 12</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 2 Agents -->
+        <div class="section-title" style="margin-top:16px">⏳ Phase 2 Agents <span>Pending deployment</span></div>
+        <div class="summary-grid">
+          <div class="summary-card" style="opacity:0.6">
+            <div class="summary-card-header">
+              <div class="icon" style="background:#fb923c22;">⚙️</div>
+              <div><h4>DevOps Engineer</h4><div style="font-size:11px;color:var(--text3)">CI/CD, monitoring, infrastructure</div></div>
+              <span class="status status-running">⏳ Pending</span>
+            </div>
+          </div>
+          <div class="summary-card" style="opacity:0.6">
+            <div class="summary-card-header">
+              <div class="icon" style="background:#f472b622;">📱</div>
+              <div><h4>Social Media Manager</h4><div style="font-size:11px;color:var(--text3)">Launch campaigns, platform strategy</div></div>
+              <span class="status status-running">⏳ Pending</span>
+            </div>
+          </div>
+          <div class="summary-card" style="opacity:0.6">
+            <div class="summary-card-header">
+              <div class="icon" style="background:#22d3ee22;">🚀</div>
+              <div><h4>Growth Hacker</h4><div style="font-size:11px;color:var(--text3)">Acquisition funnels, viral loops</div></div>
+              <span class="status status-running">⏳ Pending</span>
+            </div>
+          </div>
+          <div class="summary-card" style="opacity:0.6">
+            <div class="summary-card-header">
+              <div class="icon" style="background:#34d39922;">📈</div>
+              <div><h4>Analytics Lead</h4><div style="font-size:11px;color:var(--text3)">Tracking, metrics, dashboards</div></div>
+              <span class="status status-running">⏳ Pending</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAT TAB -->
+    <div id="tab-chat" class="tab-content">
+      <div class="content">
+        <div class="two-col">
+          <div class="panel">
+            <div class="panel-header">💬 Team Communication Log</div>
+            <div class="panel-body">
+              <div class="chat-msg">
+                <div class="chat-header">
+                  <span class="chat-name" style="color:var(--cyan)">Vision</span>
+                  <span class="chat-role" style="background:var(--cyan);color:#000;font-size:10px">Coordinator</span>
+                  <span class="chat-time">13:49 UTC</span>
+                </div>
+                <div class="chat-text">Deploying Phase 1 team: SEO Specialist, Content Marketer, Frontend Dev, Product Manager. All agents tasked with auditing mayagen.ai and producing actionable reports.</div>
+              </div>
+              <div class="chat-msg">
+                <div class="chat-header">
+                  <span class="chat-name" style="color:var(--accent)">SEO Specialist</span>
+                  <span class="chat-role tag-seo">SEO</span>
+                  <span class="chat-time">13:52 UTC</span>
+                </div>
+                <div class="chat-text">Audit complete. <strong>The site is essentially invisible to search engines.</strong> Client-side React SPA — crawlers see empty <code>&lt;div id="root"&gt;</code>. No robots.txt, no sitemap, no OG tags. SEO score: 15/100. Top priority: migrate to Next.js for SSR. Full report saved.</div>
+              </div>
+              <div class="chat-msg">
+                <div class="chat-header">
+                  <span class="chat-name" style="color:var(--green)">Content Marketer</span>
+                  <span class="chat-role tag-content">Content</span>
+                  <span class="chat-time">13:53 UTC</span>
+                </div>
+                <div class="chat-text">Strategy delivered. 5 content pillars, 30 blog posts across 12 weeks, full social media plans (Twitter/LinkedIn/Instagram), email sequences for onboarding + re-engagement + upgrade. 3 blog outlines ready for production. Note: site is JS-rendered so I couldn't extract exact features — will refine once product team confirms capabilities.</div>
+              </div>
+              <div class="chat-msg">
+                <div class="chat-header">
+                  <span class="chat-name" style="color:var(--blue)">Frontend Dev</span>
+                  <span class="chat-role tag-frontend">Frontend</span>
+                  <span class="chat-time">13:54 UTC</span>
+                </div>
+                <div class="chat-text">Audit done. Tech stack: React CRA + Redux + Tailwind on Vercel. <strong>Critical: single 2.47 MB JS bundle</strong> with zero code splitting. That's 6-12s mobile load. 91 routes all client-rendered. Good news: already on Vercel, so Next.js migration is the natural path. Also found ~30 free tool routes — massive untapped SEO opportunity once crawlable.</div>
+              </div>
+              <div class="chat-msg">
+                <div class="chat-header">
+                  <span class="chat-name" style="color:var(--yellow)">Product Manager</span>
+                  <span class="chat-role tag-product">Product</span>
+                  <span class="chat-time">13:54 UTC</span>
+                </div>
+                <div class="chat-text">Strategy complete. Mayagen has a surprisingly broad feature set — meme generator, logo creator, flyers, infographics, mockups, brand kit, content scheduler, bulk designer, and community gallery. This breadth IS the differentiator. Competitive sweet spot: "accessible + broad" — the affordable Canva alternative with better AI. Recommended 4-tier pricing: Free/$9/$19/$29. MRR target: $70K by month 12. Critical gap: no video generation (table stakes in 2026).</div>
+              </div>
+              <div class="chat-msg">
+                <div class="chat-header">
+                  <span class="chat-name" style="color:var(--cyan)">Vision</span>
+                  <span class="chat-role" style="background:var(--cyan);color:#000;font-size:10px">Coordinator</span>
+                  <span class="chat-time">13:55 UTC</span>
+                </div>
+                <div class="chat-text">All Phase 1 reports received and reviewed. Clear consensus: <strong>Next.js migration is the #1 priority</strong> — it solves SEO, performance, and code splitting simultaneously. Briefed SK with consolidated findings. Phase 2 agents (DevOps, Social, Growth, Analytics) pending SK's go-ahead.</div>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">📋 Activity Timeline</div>
+            <div class="panel-body">
+              <div class="timeline-item">
+                <div class="timeline-icon" style="background:var(--cyan)22">💎</div>
+                <div class="timeline-content">
+                  <div class="title">Vision initialized</div>
+                  <div class="time">13:37 UTC</div>
+                  <div class="detail">First boot. Identity configured.</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon" style="background:#60a5fa22">📡</div>
+                <div class="timeline-content">
+                  <div class="title">Telegram connected</div>
+                  <div class="time">13:42 UTC</div>
+                  <div class="detail">SK paired via Telegram (@Shivak444)</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon" style="background:#7c5cfc22">🏗️</div>
+                <div class="timeline-content">
+                  <div class="title">Team structure designed</div>
+                  <div class="time">13:46 UTC</div>
+                  <div class="detail">14 roles across 6 departments</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon" style="background:#34d39922">🚀</div>
+                <div class="timeline-content">
+                  <div class="title">Phase 1 agents deployed</div>
+                  <div class="time">13:49 UTC</div>
+                  <div class="detail">4 agents: SEO, Content, Frontend, Product</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon" style="background:#7c5cfc22">🔍</div>
+                <div class="timeline-content">
+                  <div class="title">SEO Audit completed</div>
+                  <div class="time">13:52 UTC</div>
+                  <div class="detail">Score: 15/100. 15 action items.</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon" style="background:#34d39922">✍️</div>
+                <div class="timeline-content">
+                  <div class="title">Content Strategy completed</div>
+                  <div class="time">13:53 UTC</div>
+                  <div class="detail">30 posts, 3-month calendar ready.</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon" style="background:#60a5fa22">💻</div>
+                <div class="timeline-content">
+                  <div class="title">Frontend Audit completed</div>
+                  <div class="time">13:54 UTC</div>
+                  <div class="detail">2.47MB bundle, 91 routes, 0 SSR.</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon" style="background:#fbbf2422">📊</div>
+                <div class="timeline-content">
+                  <div class="title">Product Strategy completed</div>
+                  <div class="time">13:54 UTC</div>
+                  <div class="detail">Roadmap + pricing + competitive analysis.</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon" style="background:var(--green)22">✅</div>
+                <div class="timeline-content">
+                  <div class="title">Phase 1 complete</div>
+                  <div class="time">13:55 UTC</div>
+                  <div class="detail">All 4 reports delivered to SK.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO REPORT TAB -->
+    <div id="tab-seo" class="tab-content">
+      <div class="content">
+        <div class="section-title">🔍 SEO Audit Report <span>Score: 15/100</span></div>
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+          <div class="stat-card"><div class="label">SEO Score</div><div class="value" style="color:var(--red)">15<span style="font-size:14px">/100</span></div></div>
+          <div class="stat-card"><div class="label">Critical Issues</div><div class="value" style="color:var(--red)">5</div></div>
+          <div class="stat-card"><div class="label">Action Items</div><div class="value">15</div></div>
+        </div>
+        <div class="finding critical"><div class="finding-title">No Server-Side Rendering</div><div class="finding-text">Entire page is &lt;div id="root"&gt; with JS bundle. Google sees empty page. Fix: Migrate to Next.js.</div></div>
+        <div class="finding critical"><div class="finding-title">No robots.txt</div><div class="finding-text">Returns SPA HTML shell. Confuses crawlers. Trivial fix.</div></div>
+        <div class="finding critical"><div class="finding-title">No sitemap.xml</div><div class="finding-text">Search engines have no map of pages. Low effort fix.</div></div>
+        <div class="finding critical"><div class="finding-title">No OG / Twitter Card Tags</div><div class="finding-text">Social shares show no previews. Low effort fix.</div></div>
+        <div class="finding warning"><div class="finding-title">307 Redirect (should be 301)</div><div class="finding-text">non-www → www uses temporary redirect. Loses link equity.</div></div>
+        <div class="section-title" style="margin-top:20px">🎯 Target Keywords</div>
+        <div class="panel"><div class="panel-body" style="overflow-x:auto">
+          <table style="width:100%;font-size:12px;border-collapse:collapse;">
+            <thead><tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:8px;color:var(--text2)">Keyword</th><th style="padding:8px;color:var(--text2)">Monthly Volume</th><th style="padding:8px;color:var(--text2)">Difficulty</th></tr></thead>
+            <tbody>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">AI image generator</td><td style="text-align:center">500K+</td><td style="text-align:center;color:var(--red)">Very High</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">AI logo generator</td><td style="text-align:center">100K+</td><td style="text-align:center;color:var(--orange)">High</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">AI meme generator</td><td style="text-align:center">80K+</td><td style="text-align:center;color:var(--yellow)">Medium-High</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">AI creative suite</td><td style="text-align:center">5K-10K</td><td style="text-align:center;color:var(--green)">Medium</td></tr>
+              <tr><td style="padding:8px">free AI image generator</td><td style="text-align:center">200K+</td><td style="text-align:center;color:var(--orange)">High</td></tr>
+            </tbody>
+          </table>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- FRONTEND REPORT TAB -->
+    <div id="tab-frontend" class="tab-content">
+      <div class="content">
+        <div class="section-title">💻 Frontend Audit Report</div>
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+          <div class="stat-card"><div class="label">JS Bundle Size</div><div class="value" style="color:var(--red);font-size:22px">2.47 MB</div></div>
+          <div class="stat-card"><div class="label">Total Routes</div><div class="value" style="font-size:22px">91</div></div>
+          <div class="stat-card"><div class="label">Code Splitting</div><div class="value" style="color:var(--red);font-size:22px">None</div></div>
+          <div class="stat-card"><div class="label">Mobile Load Time</div><div class="value" style="color:var(--red);font-size:22px">6-12s</div></div>
+        </div>
+        <div class="section-title">Tech Stack</div>
+        <div class="stats-grid" style="grid-template-columns:repeat(6,1fr);margin-bottom:20px">
+          <div class="stat-card" style="text-align:center"><div class="value" style="font-size:14px">React CRA</div><div class="label">Framework</div></div>
+          <div class="stat-card" style="text-align:center"><div class="value" style="font-size:14px">Redux</div><div class="label">State</div></div>
+          <div class="stat-card" style="text-align:center"><div class="value" style="font-size:14px">Tailwind</div><div class="label">CSS</div></div>
+          <div class="stat-card" style="text-align:center"><div class="value" style="font-size:14px">Axios</div><div class="label">HTTP</div></div>
+          <div class="stat-card" style="text-align:center"><div class="value" style="font-size:14px">Google</div><div class="label">Auth</div></div>
+          <div class="stat-card" style="text-align:center"><div class="value" style="font-size:14px">Vercel</div><div class="label">Hosting</div></div>
+        </div>
+        <div class="finding critical"><div class="finding-title">Monolithic JS Bundle (2.47 MB)</div><div class="finding-text">All 91 routes in one file. React.lazy() + Suspense can achieve 60-80% reduction immediately.</div></div>
+        <div class="finding critical"><div class="finding-title">No SSR/SSG</div><div class="finding-text">91 routes completely invisible to crawlers. Next.js migration recommended (already on Vercel).</div></div>
+        <div class="finding warning"><div class="finding-title">Render-Blocking Font Loading</div><div class="finding-text">Google Fonts via CSS @import creates blocking chain. Move to &lt;link preconnect&gt;.</div></div>
+        <div class="finding warning"><div class="finding-title">Third-Party Script Bloat</div><div class="finding-text">Google Sign-In loads on every page. PostHog + GTM on initial render. Lazy-load where possible.</div></div>
+      </div>
+    </div>
+
+    <!-- CONTENT REPORT TAB -->
+    <div id="tab-content-report" class="tab-content">
+      <div class="content">
+        <div class="section-title">✍️ Content Marketing Strategy</div>
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+          <div class="stat-card"><div class="label">Blog Posts Planned</div><div class="value" style="font-size:22px">30</div><div class="change neutral">12 weeks</div></div>
+          <div class="stat-card"><div class="label">Content Pillars</div><div class="value" style="font-size:22px">5</div></div>
+          <div class="stat-card"><div class="label">Email Sequences</div><div class="value" style="font-size:22px">3</div><div class="change neutral">Onboard + Re-engage + Upgrade</div></div>
+          <div class="stat-card"><div class="label">Tutorial Ideas</div><div class="value" style="font-size:22px">14</div></div>
+        </div>
+        <div class="section-title">Content Pillars</div>
+        <div class="stats-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:20px">
+          <div class="stat-card" style="text-align:center;border-top:3px solid var(--accent)"><div class="value" style="font-size:13px">Education</div><div class="label">AI creativity</div></div>
+          <div class="stat-card" style="text-align:center;border-top:3px solid var(--blue)"><div class="value" style="font-size:13px">Tutorials</div><div class="label">How-tos</div></div>
+          <div class="stat-card" style="text-align:center;border-top:3px solid var(--green)"><div class="value" style="font-size:13px">Spotlights</div><div class="label">User stories</div></div>
+          <div class="stat-card" style="text-align:center;border-top:3px solid var(--yellow)"><div class="value" style="font-size:13px">Thought Leadership</div><div class="label">Industry trends</div></div>
+          <div class="stat-card" style="text-align:center;border-top:3px solid var(--pink)"><div class="value" style="font-size:13px">Productivity</div><div class="label">Workflows</div></div>
+        </div>
+        <div class="section-title">Social Media Cadence</div>
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+          <div class="stat-card"><div class="label">Twitter/X</div><div class="value" style="font-size:18px">5-7<span style="font-size:12px;color:var(--text3)">/week</span></div><div style="font-size:11px;color:var(--text2);margin-top:4px">Tips, threads, hot takes, polls</div></div>
+          <div class="stat-card"><div class="label">LinkedIn</div><div class="value" style="font-size:18px">3-4<span style="font-size:12px;color:var(--text3)">/week</span></div><div style="font-size:11px;color:var(--text2);margin-top:4px">Thought leadership, case studies</div></div>
+          <div class="stat-card"><div class="label">Instagram</div><div class="value" style="font-size:18px">4-5<span style="font-size:12px;color:var(--text3)">/week</span></div><div style="font-size:11px;color:var(--text2);margin-top:4px">Showcases, reels, carousels</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCT REPORT TAB -->
+    <div id="tab-product-report" class="tab-content">
+      <div class="content">
+        <div class="section-title">📊 Product Strategy Report</div>
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+          <div class="stat-card"><div class="label">Features Identified</div><div class="value" style="font-size:22px">20+</div></div>
+          <div class="stat-card"><div class="label">User Personas</div><div class="value" style="font-size:22px">4</div></div>
+          <div class="stat-card"><div class="label">Roadmap Phases</div><div class="value" style="font-size:22px">3</div><div class="change neutral">12 months</div></div>
+          <div class="stat-card"><div class="label">MRR Target</div><div class="value" style="font-size:22px;color:var(--green)">$70K</div></div>
+        </div>
+        <div class="section-title">Product Roadmap</div>
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+          <div class="stat-card" style="border-top:3px solid var(--red)">
+            <div class="label">Phase 1: Foundation (Mo 1-3)</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:8px">
+              • Fix SSR for SEO<br>• Landing page overhaul<br>• Image quality benchmark<br>• Background removal tool<br>• Onboarding flow<br>• Referral program
+            </div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--orange)">
+            <div class="label">Phase 2: Differentiate (Mo 4-6)</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:8px">
+              • Video/animation generation<br>• Pricing tiers launch<br>• Multi-platform publisher<br>• API access (beta)<br>• Community challenges<br>• Analytics dashboard
+            </div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--green)">
+            <div class="label">Phase 3: Scale (Mo 7-12)</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:8px">
+              • Mobile apps (iOS + Android)<br>• Enterprise/Teams tier<br>• AI brand voice/style<br>• Template marketplace<br>• Internationalization<br>• Plugin ecosystem
+            </div>
+          </div>
+        </div>
+        <div class="section-title">Risk Assessment</div>
+        <div class="finding warning"><div class="finding-title">AI Model Quality</div><div class="finding-text">Competing on generation quality vs Midjourney/DALL-E is hard. Mitigation: multi-model approach, integrate best-in-class via API.</div></div>
+        <div class="finding warning"><div class="finding-title">Canva Feature Parity</div><div class="finding-text">Canva could launch identical features. Mitigation: move faster on meme/social niche, build community moat.</div></div>
+        <div class="finding"><div class="finding-title">Infrastructure Costs</div><div class="finding-text">AI generation is expensive at scale. Mitigation: credit system caps usage, caching, queueing.</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Task Detail Modal -->
+<div id="task-modal-backdrop" class="task-modal-backdrop" onclick="closeTaskModal(event)">
+  <div class="task-modal" onclick="event.stopPropagation()">
+    <div class="task-modal-header">
+      <div>
+        <div id="task-modal-title" class="task-modal-title"></div>
+        <div id="task-modal-subtitle" class="task-modal-subtitle"></div>
+      </div>
+      <button class="task-modal-close" onclick="closeTaskModal(event)">&times;</button>
+    </div>
+    <div id="task-modal-body" class="task-modal-body"></div>
+  </div>
+</div>
+
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (event && event.currentTarget) {
+    event.currentTarget.classList.add('active');
+  }
+}
+
+const TASK_DETAILS = {
+  'task-001': {
+    title: 'TASK: Optimize Meme Generator Landing Page',
+    subtitle: 'ID: task-001  b7 Owners: @seo-growth, @content-lead  b7 Status: active',
+    html: `
+      <div class="task-meta-row">
+        <span class="task-pill">Tool: Meme Generator</span>
+        <span class="task-pill">Goal: visitors  b7 signups  b7 first meme  b7 first scheduled post</span>
+      </div>
+      <div class="task-section-title">Subtasks</div>
+      <ul class="task-checklist">
+        <li>Apply SEO v2 recommendations for <code>/meme-generator/</code> (structure & internal links drafted in v1)</li>
+        <li>Update copy to reflect full suite (create  b7 plan  b7 schedule in 100+ languages)</li>
+        <li>Add clear flow from meme creation into planner/scheduler</li>
+      </ul>
+      <div class="task-section-title">Links</div>
+      <div class="task-links">
+        <a href="../reports/seo-audit-v2.md" target="_blank">SEO v2</a>
+        <span> b7</span>
+        <a href="../reports/growth-strategy-v2.md" target="_blank">Growth v2</a>
+        <span> b7</span>
+        <a href="../reports/meme-generator-landing-copy-v2.md" target="_blank">Copy v2</a>
+        <span> b7</span>
+        <a href="../reports/meme-generator-landing-seo-structure-v1.md" target="_blank">SEO structure v1</a>
+        <span> b7</span>
+        <a href="../reports/meme-generator-meme-to-planner-scheduler-flow-v1.md" target="_blank">Meme  b7 Planner  b7 Scheduler flow</a>
+      </div>
+      <div class="task-section-title">Recent Notes</div>
+      <p><strong>2026-02-13, heartbeats 1-5</strong> &mdash; Claimed from INBOX, drafted SEO structure & copy v2 for <code>/meme-generator/</code>, and specced the concrete meme  b7 post  b7 planner  b7 scheduler funnel (including CTAs, post composer panel, confirmation state, and analytics events).</p>
+      <p><strong>Next:</strong> merge specs into actual UI, coordinate with product/UX on visuals for the meme  b7 post  b7 planner flow, and tune once live experiments run.</p>
+    `
+  },
+  'task-002': {
+    title: 'TASK: Update Logo Maker as Suite Flagship',
+    subtitle: 'ID: task-002  b7 Owners: @product-ux, @content-lead  b7 Status: active',
+    html: `
+      <div class="task-meta-row">
+        <span class="task-pill">Tool: Logo Maker</span>
+        <span class="task-pill">Goal: logo  b7 brand kit  b7 templates  b7 scheduled launch posts</span>
+      </div>
+      <div class="task-section-title">Subtasks</div>
+      <ul class="task-checklist">
+        <li>Review Product Strategy v2 recommendations for brand identity</li>
+        <li>Update landing page structure & copy accordingly</li>
+        <li>Ensure flow: new logo  b7 brand kit  b7 social templates  b7 scheduled launch posts</li>
+      </ul>
+      <div class="task-section-title">Links</div>
+      <div class="task-links">
+        <a href="../reports/product-strategy-v2.md" target="_blank">Product v2</a>
+        <span> b7</span>
+        <a href="../reports/content-strategy-v2.md" target="_blank">Content v2</a>
+        <span> b7</span>
+        <a href="../reports/logo-maker-landing-ux-v1.md" target="_blank">Logo Maker UX v1</a>
+        <span> b7</span>
+        <a href="../reports/logo-maker-landing-copy-v2.md" target="_blank">Logo Maker copy v2</a>
+        <span> b7</span>
+        <a href="../reports/logo-maker-logo-to-launch-flow-v1.md" target="_blank">Logo  b7 Brand kit  b7 Launch flow spec</a>
+        <span> b7</span>
+        <a href="../reports/logo-maker-logo-to-launch-planner-multilingual-ux-v2.md" target="_blank">Planner + multilingual UX v2</a>
+        <span> b7</span>
+        <a href="../reports/logo-maker-logo-to-launch-microcopy-v1.md" target="_blank">Logo-to-launch microcopy v1</a>
+        <span> b7</span>
+        <a href="../reports/logo-maker-logo-to-launch-5-minute-path-v1.md" target="_blank">5-minute path v1</a>
+      </div>
+      <div class="task-section-title">Recent Notes</div>
+      <p><strong>2026-02-13</strong> &mdash; UX, copy, planner/multilingual specs, microcopy, and a 5-minute happy path have been drafted to make Logo Maker a true suite flagship: logo  b7 brand kit  b7 launch assets  b7 Launch Week planner (with optional multilingual).</p>
+      <p><strong>Next:</strong> align Figma mocks and implementation with these specs, and wire Analytics v2 events/dashboards around time-to-first-scheduled-launch and multilingual adoption.</p>
+    `
+  },
+  'task-003': {
+    title: 'TASK: Product Mockups Flow',
+    subtitle: 'ID: task-003  b7 Owners: @product-ux, @seo-growth  b7 Status: active',
+    html: `
+      <div class="task-meta-row">
+        <span class="task-pill">Tool: Product Mockups</span>
+        <span class="task-pill">Goal: mockup  b7 ads  b7 campaign  b7 scheduled posts</span>
+      </div>
+      <div class="task-section-title">Subtasks</div>
+      <ul class="task-checklist">
+        <li>Define primary use cases (ecommerce product shots, SaaS visuals, etc.)</li>
+        <li>Map flow: mockup created → added to ad template → scheduled via planner</li>
+        <li>Update landing page outline & internal links</li>
+      </ul>
+      <div class="task-section-title">Links</div>
+      <div class="task-links">
+        <a href="../reports/seo-audit-v2.md" target="_blank">SEO v2</a>
+        <span> b7</span>
+        <a href="../reports/growth-strategy-v2.md" target="_blank">Growth v2</a>
+        <span> b7</span>
+        <a href="../reports/product-mockups-flow-v1.md" target="_blank">Flow v1</a>
+        <span> b7</span>
+        <a href="../reports/product-mockups-landing-seo-structure-v1.md" target="_blank">Landing SEO structure v1</a>
+        <span> b7</span>
+        <a href="../reports/product-mockups-mockup-to-campaign-friction-v1.md" target="_blank">Mockup → campaign friction v1</a>
+        <span> b7</span>
+        <a href="../reports/product-mockups-mockup-to-campaign-planner-multilingual-ux-v2.md" target="_blank">Campaign planner + multilingual UX v2</a>
+        <span> b7</span>
+        <a href="../reports/product-mockups-analytics-and-metrics-v1.md" target="_blank">Analytics & metrics v1</a>
+        <span> b7</span>
+        <a href="../reports/product-mockups-funnel-experiments-v2.md" target="_blank">Funnel experiments v2</a>
+        <span> b7</span>
+        <a href="../reports/product-mockups-campaign-archetypes-and-templates-v1.md" target="_blank">Campaign archetypes & templates v1</a>
+        <span> b7</span>
+        <a href="../reports/product-mockups-analytics-and-metrics-v1.md" target="_blank">Analytics & metrics v1</a>
+        <span> b7</span>
+        <a href="../reports/product-mockups-vs-logo-maker-campaign-planner-ux-alignment-v1.md" target="_blank">Planner UX alignment (Logo vs Mockups)</a>
+      </div>
+      <div class="task-section-title">Recent Notes</div>
+      <p><strong>2026-02-13</strong> &mdash; Use cases, landing structure, mockup → ads → Campaign Mode → planner flow, friction audit, planner/multilingual UX, analytics/metrics, experiments, and campaign archetypes have all been drafted to turn Product Mockups into a true campaign entry point.</p>
+      <p><strong>Next:</strong> implement Campaign Mode planner UI, wire analytics events, and run the prioritized funnel experiments to validate impact on scheduled campaigns and weekly planner habit.</p>
+    `
+  },
+  'task-005': {
+    title: 'TASK: Weekly Content Pack Experiment',
+    subtitle: 'ID: task-005  b7 Owners: @growth, @content-lead  b7 Status: active',
+    html: `
+      <div class="task-meta-row">
+        <span class="task-pill">Theme: Weekly Content Pack</span>
+        <span class="task-pill">Goal: auto-generate a week of posts → scheduled pack</span>
+      </div>
+      <div class="task-section-title">Subtasks</div>
+      <ul class="task-checklist">
+        <li>Define experiment & UX spec</li>
+        <li>Draft copy & microcopy for key surfaces</li>
+        <li>Design lifecycle/email sequence & surface matrix</li>
+      </ul>
+      <div class="task-section-title">Links</div>
+      <div class="task-links">
+        <a href="../reports/weekly-content-pack-experiment-spec-v1.md" target="_blank">Experiment spec v1</a>
+        <span> b7</span>
+        <a href="../reports/weekly-content-pack-experiment-copy-v2.md" target="_blank">Copy v2</a>
+        <span> b7</span>
+        <a href="../reports/weekly-content-pack-microcopy-v1.md" target="_blank">Microcopy v1</a>
+        <span> b7</span>
+        <a href="../reports/weekly-content-pack-experiment-email-sequence-v2.md" target="_blank">Email sequence v2</a>
+        <span> b7</span>
+        <a href="../reports/weekly-content-pack-experiment-surface-matrix-v1.md" target="_blank">Surface & messaging matrix v1</a>
+      </div>
+      <div class="task-section-title">Recent Notes</div>
+      <p><strong>2026-02-13</strong> &mdash; Spec, copy, microcopy, email sequences, and a surface/messaging matrix have been drafted so Weekly Content Packs tell the same create → plan → schedule story across email, dashboard, planner, and multilingual hints.</p>
+      <p><strong>Next:</strong> coordinate with growth & lifecycle to set triggers/segments, wire Analytics v2 events (time-to-first-scheduled-week, multilingual adoption), and run subject line/CTA/surface-order experiments.</p>
+    `
+  }
+};
+
+function openTaskModal(taskId) {
+  const config = TASK_DETAILS[taskId];
+  if (!config) return;
+  document.getElementById('task-modal-title').textContent = config.title;
+  document.getElementById('task-modal-subtitle').textContent = config.subtitle;
+  document.getElementById('task-modal-body').innerHTML = config.html;
+  document.getElementById('task-modal-backdrop').classList.add('active');
+}
+
+function closeTaskModal(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('task-modal-backdrop').classList.remove('active');
+}
+</script>
+</body>
+</html>
