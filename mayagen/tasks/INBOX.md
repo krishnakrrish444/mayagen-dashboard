@@ -22,22 +22,6 @@ Each task here is a unit of work for the Mayagen AI squad. When a task is picked
 
 ---
 
-## TASK: Product Mockups Flow
-- ID: task-003
-- Status: inbox
-- Owners: @product-ux, @seo-growth
-- Created: 2026-02-13
-- Context:
-  - Tool: Product Mockups (ecommerce & SaaS assets)
-  - Goal: Clarify the flow from mockups → social ads → scheduled campaign
-- Subtasks:
-  - [ ] Define primary use cases (ecommerce product shots, SaaS visuals, etc.)
-  - [ ] Map flow: mockup created → added to ad template → scheduled via planner
-  - [ ] Update landing page outline & internal links
-- Links:
-  - SEO v2: `/mayagen/reports/seo-audit-v2.md`
-  - Growth v2: `/mayagen/reports/growth-strategy-v2.md`
-
 ---
 
 ## TASK: Define Mayagen North Star Dashboards

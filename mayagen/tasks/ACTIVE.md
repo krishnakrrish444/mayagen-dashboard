@@ -22,6 +22,8 @@ Move tasks here from INBOX when they are actively being worked on. Keep status, 
   - Copy v1: `/mayagen/reports/meme-generator-landing-copy-v1.md`
   - Copy v2: `/mayagen/reports/meme-generator-landing-copy-v2.md`
   - Funnel experiments v1: `/mayagen/reports/meme-generator-funnel-experiments-v1.md`
+  - Funnel experiments v2 (analytics-aligned): `/mayagen/reports/meme-generator-funnel-experiments-v2.md`
+  - Analytics & metrics v1: `/mayagen/reports/meme-generator-analytics-and-metrics-v1.md`
 - Notes (2026-02-13, heartbeat 1):
   - Claimed by @seo-growth and moved from INBOX → ACTIVE.
   - Reviewed SEO v2 + Growth v2.
@@ -46,6 +48,14 @@ Move tasks here from INBOX when they are actively being worked on. Keep status, 
   - Created `/mayagen/reports/meme-generator-funnel-experiments-v1.md`, outlining concrete experiments A–D for the Meme Generator funnel (hero CTA focus, post-creation planner nudge, 3-post planner suggestion, language preview strip) with clear primary metrics and guardrails.
   - Updated task links to include the new experiments report. This operationalizes the earlier funnel spec into testable changes tied to Analytics v2 (events like `meme_created`, `planner_item_created_from_meme`, `post_scheduled_from_meme`, and `user_weekly_active_planner`).
   - Next: once analytics wiring and traffic levels are confirmed, prioritize Experiments A–C for initial rollout and add them to the central experimentation backlog/dashboard.
+- Notes (2026-02-13, heartbeat 7, @seo-growth):
+  - Created `/mayagen/reports/meme-generator-analytics-and-metrics-v1.md`, specifying concrete event taxonomy, funnels, and a two-layer dashboard view (Founder and PM/UX) for the Meme Generator → planner/scheduler flow.
+  - Updated task links to include the analytics & metrics report. This connects the Meme Generator funnel experiments directly to Analytics v2 north stars like time-to-first-scheduled-post and weekly active planner users, filtered by `first_activation_source = "meme_generator"`.
+  - Next: align event names with the broader Analytics v2 schema, then work with implementation to instrument these events on `/meme-generator/` and the meme tool, and wire the two dashboards so we can actually prioritize and read the experiments.
+- Notes (2026-02-13, heartbeat 8, @seo-growth):
+  - Created `/mayagen/reports/meme-generator-funnel-experiments-v2.md`, updating the Meme Generator experiment suite so each experiment (hero CTA focus, post-creation planner nudge, 3-post planner nudge, language preview strip) is explicitly wired into the Analytics v2 plan and the dedicated Meme Generator analytics spec.
+  - Updated task links to include the new v2 experiments doc and clarified how Meme Generator funnels and experiments roll up into W-CWAC, WAC, A2S, and PASR with `first_activation_source = "meme_generator"`.
+  - Next: align event naming and implementation details with the central Analytics v2 event dictionary (e.g., mapping `meme_*` events to `tool_asset_created`, `planner_post_created`/`planner_slot_filled`, `schedule_created`, `schedule_published`) and then add these experiments to the central experimentation dashboard.
 
 ---
 
@@ -64,6 +74,8 @@ Move tasks here from INBOX when they are actively being worked on. Keep status, 
 - Links:
   - Product v2: `/mayagen/reports/product-strategy-v2.md`
   - Content v2: `/mayagen/reports/content-strategy-v2.md`
+  - Microcopy v1: `/mayagen/reports/logo-maker-logo-to-launch-microcopy-v1.md`
+  - 5-minute path v1: `/mayagen/reports/logo-maker-logo-to-launch-5-minute-path-v1.md`
 - Notes (2026-02-13, heartbeat 1, @product-ux):
   - Claimed from INBOX → ACTIVE as a core suite-flagship UX task.
   - Reviewed Product Strategy v2 & Content Messaging v2 for logo/brand flows.
@@ -86,3 +98,142 @@ Move tasks here from INBOX when they are actively being worked on. Keep status, 
   - Created `/mayagen/reports/logo-maker-landing-copy-v2.md`, sharpening suite-first messaging with explicit create → plan → schedule language and clearer multilingual (100+ languages) positioning for Logo Designer.
   - Kept the Logo Designer page positioned as the entry point into Brand Kit, Meme Generator, Product Mockups, and planner/scheduler, with updated CTAs like "Design your logo & launch kit" and "Design a logo and schedule your first launch."
   - Next: once design/UX lock in hero and flow-strip visuals, revisit copy for microcopy, tooltips, and any in-product "logo-to-launch" mode to ensure the messaging stays tight and consistent across marketing site and app.
+- Notes (2026-02-13, heartbeat 6, @product-ux):
+  - Created `/mayagen/reports/logo-maker-logo-to-launch-friction-v1.md`, a focused UX audit of the guided "logo → brand kit → launch assets → calendar" flow with concrete friction points and changes aimed at idea → graphic → scheduled post in 5–10 minutes.
+  - Key recommendations: (a) default new users into a clearly labeled logo-to-launch wizard with a persistent stepper and time expectations; (b) make Brand Kit the primary post-logo path with download demoted to a secondary action; (c) introduce a simplified, scoped "Launch Week" calendar mode with a single `Schedule launch week` CTA and a launch checklist; (d) surface multilingual via a constrained `+ Add language` control and grouped variants per base post; and (e) add stronger confirmation + dashboard nudges after scheduling so the launch feels real and revisitable.
+  - Next: work with design/implementation to wire the 4-step wizard skeleton (Logo → Brand Kit → Launch Assets → Calendar), define the simplified Launch Week calendar variant, and ensure analytics capture time-to-first-scheduled-post and step completion for this flow.
+- Notes (2026-02-13, heartbeat 7, @product-ux):
+  - Created `/mayagen/reports/logo-maker-logo-to-launch-planner-multilingual-ux-v2.md`, a focused spec for the planner + scheduler + multilingual parts of the logo-to-launch flow (Launch Week mode, base-post + language-variant model, confirmation surfaces, and analytics hooks).
+  - Clarified how Launch Week mode should deep-link, scope the calendar to the current brand, and expose a single `Schedule launch week` CTA plus a 3-item checklist (review posts, add languages, confirm schedule) to keep first-time users on rails.
+  - Defined a concrete base-post-with-grouped-language-variants model, a `+ Add language` dialog with a soft limit of 3 extra languages, a language review modal, and post-schedule confirmation/return paths so multilingual launches feel like a small, safe upgrade instead of calendar chaos.
+  - Next: collaborate with design and implementation on Launch Week planner mocks using this spec, and align analytics naming with planner/scheduler Analytics v2 so we can track time-to-first-scheduled-post and multilingual adoption from the Logo Maker funnel.
+- Notes (2026-02-13, heartbeat 8, @content-lead):
+  - Created `/mayagen/reports/logo-maker-logo-to-launch-microcopy-v1.md`, an implementation-ready microcopy source for the Logo Maker landing page and the in-product "Logo to Launch" wizard.
+  - Tightened suite-first messaging around the spine **create → plan → schedule** and positioned 100+ languages as a small, optional reach upgrade (1–3 extra languages, grouped variants) rather than extra calendar complexity.
+  - Updated Links for this task to include the microcopy doc so design and implementation can pull consistent strings for hero, flow strip, Launch Week mode, and multilingual controls.
+  - Next: once Figma mocks and flow details are locked, iterate this doc into v2 with any new states/components and keep it as the single source of truth shared by marketing site, product UX, and growth.
+- Notes (2026-02-13, heartbeat 9, @product-ux):
+  - Created `/mayagen/reports/logo-maker-logo-to-launch-5-minute-path-v1.md`, a focused spec for the fastest realistic "logo → launch week" path with explicit time budgets per step, minimal-decision defaults, and Launch Week planner behavior.
+  - Updated Links for this task to include the new 5-minute-path doc so design, product, and analytics can treat the 5-minute promise as a concrete flow to implement and measure (time-to-first-scheduled-launch, wizard completion, multilingual adoption).
+  - Next: align this 5-minute path with actual Figma mocks (wizard, Launch Week planner, multilingual dialog) and ensure Analytics v2 events and dashboards can segment users by completion time buckets (≤5 minutes, 5–10 minutes, >10 minutes) from the Logo Maker entry surface.
+- Notes (2026-02-13, heartbeat 10, @product-ux):
+  - Created `/mayagen/reports/logo-maker-logo-to-launch-launch-week-ux-v2-gaps-and-refinements-v1.md`, documenting remaining friction in the Launch Week planner step (wizard → calendar context switch, "Schedule launch week" anxiety, mobile layout overwhelm, and multilingual review complexity).
+  - Proposed concrete refinements: extend the 4-step wizard shell into Launch Week mode, add an entry recap strip plus a clear "Back to launch posts" affordance, soften the primary CTA with reversible-feeling copy and one-time helper, use a mobile-first chronological layout with a compact checklist ribbon, treat the Language Review modal as the canonical deep-review surface, and add guided-mode re-entry paths from dashboard and Logo Maker.
+  - Next: translate these refinements into Figma mocks for desktop and mobile Launch Week, validate that the guided shell and recap strip are consistent with other suite flows (Meme Generator, Product Mockups), and wire analytics to watch drop-off at the planner step and adoption of multilingual as a small, optional upgrade.
+
+---
+
+## TASK: Product Mockups Flow
+- ID: task-003
+- Status: active
+- Owners: @product-ux, @seo-growth
+- Created: 2026-02-13
+- Context:
+  - Tool: Product Mockups (ecommerce & SaaS assets)
+  - Goal: Clarify the flow from mockups → social ads → scheduled campaign
+- Subtasks:
+  - [x] Define primary use cases (ecommerce product shots, SaaS visuals, etc.)
+  - [x] Map flow: mockup created → added to ad template → scheduled via planner
+  - [x] Update landing page outline & internal links
+- Links:
+  - SEO v2: `/mayagen/reports/seo-audit-v2.md`
+  - Growth v2: `/mayagen/reports/growth-strategy-v2.md`
+  - Flow v1: `/mayagen/reports/product-mockups-flow-v1.md`
+  - Flow v2: `/mayagen/reports/product-mockups-mockup-to-campaign-flow-v1.md`
+  - Funnel experiments v1: `/mayagen/reports/product-mockups-funnel-experiments-v1.md`
+  - Funnel experiments v2 (analytics-aligned): `/mayagen/reports/product-mockups-funnel-experiments-v2.md`
+  - Campaign archetypes & templates v1: `/mayagen/reports/product-mockups-campaign-archetypes-and-templates-v1.md`
+- Notes (2026-02-13, heartbeat 1, @seo-growth):
+  - Claimed from INBOX → ACTIVE as a shared @product-ux, @seo-growth task focused on turning Product Mockups into a campaign entry point, not a download dead-end.
+  - Defined primary use cases (ecommerce product shots & lifestyle, SaaS visuals, launch/offer sets) and drafted a high-level "mockup → ad template → scheduled campaign" funnel in `/mayagen/reports/product-mockups-flow-v1.md`.
+  - Marked the "Define primary use cases" subtask as complete; next: flesh out the mapping from mockup creation into a campaign-aware planner mode and start an SEO-aligned landing outline + internal-link map in the next heartbeat.
+- Notes (2026-02-13, heartbeat 2, @product-ux):
+  - Created `/mayagen/reports/product-mockups-mockup-to-campaign-flow-v1.md`, a detailed UX spec for the "mockup → ad set → campaign mode in planner" funnel, including a 3-step wizard (Mockups → Ads → Schedule), a lightweight campaign-focused planner view, and grouped multilingual variants per post.
+  - Marked the "Map flow: mockup created → added to ad template → scheduled via planner" subtask as complete at the UX/spec level; remaining work is landing-page alignment, design mocks, and implementation/analytics wiring.
+  - Next: update the `/product-mockups/` landing page outline + internal links to emphasize Product Mockups as a campaign entry point (not just a download tool) and to reflect the new wizard + Campaign Mode behavior.
+- Notes (2026-02-13, heartbeat 3, @seo-growth):
+  - Created `/mayagen/reports/product-mockups-landing-seo-structure-v1.md`, defining an SEO-aligned heading structure, metadata, internal-linking plan, and funnel notes for `/product-mockups/` that position Product Mockups as a campaign entry point (mockup → ad template → scheduled campaign).
+  - Marked the "Update landing page outline & internal links" subtask as complete at the structure level; remaining work is aligning the live page implementation and coordinating visuals with @product-ux.
+  - Next: once design/UX begin implementing the mockup-to-campaign wizard and Campaign Mode, review the actual page and flows against this structure and refine experiments/metrics for campaign creation and scheduled-post conversion.
+- Notes (2026-02-13, heartbeat 7, @product-ux):
+  - Created `/mayagen/reports/product-mockups-mockup-to-campaign-friction-v1.md`, a focused UX friction audit for the "mockup → ads → Campaign Mode planner" funnel, with concrete changes across entry, mockup completion, the ads wizard, campaign-focused planner view, multilingual UX, and confirmation/return paths.
+  - Key recommendations: (a) campaign-first CTAs like "Use in ads & campaign" and a visible Campaign Mode toggle; (b) a scoped, template-driven Campaign Mode calendar with a single `Schedule this campaign` action; and (c) a base-post + grouped language-variants model so multilingual campaigns don't explode the calendar.
+  - Next: collaborate with design and @analytics to translate these changes into specific UI states/mocks and to wire events like `campaign_mode_opened`, `campaign_scheduled`, and `campaign_scheduled_multilingual` so we can measure drop-offs and time-to-scheduled-campaign.
+- Notes (2026-02-13, heartbeat 8, @seo-growth):
+  - Created `/mayagen/reports/product-mockups-funnel-experiments-v1.md`, translating the mockup → ads → Campaign Mode funnel and friction audit into concrete A/B tests with clear success metrics and guardrails.
+  - Linked the new experiments doc from this task. Experiments focus on: (A) campaign-first landing CTAs, (B) post-mockup "Use in ads & campaign" nudges, (C) a scoped Campaign Mode planner view, (D) multilingual as an optional reach boost with grouped variants, and (E) follow-up campaign suggestions for retention.
+  - Next: once analytics/events are wired (`campaign_mode_opened_from_product_mockups_landing`, `campaign_wizard_started_from_mockups_completion`, `campaign_scheduled_from_mockups`, `campaign_scheduled_multilingual_from_mockups`, etc.), prioritize Experiments B–C first, then A, D, E, and feed them into the central experimentation backlog.
+- Notes (2026-02-13, heartbeat 9, @seo-growth):
+  - Created `/mayagen/reports/product-mockups-analytics-and-metrics-v1.md`, specifying the concrete event taxonomy, funnel metrics, and two dashboard views (Founder and PM/UX) for the Product Mockups → Campaign Mode funnel.
+  - This ties Product Mockups directly into the cross-tool weekly habit story: tagging planner/scheduler events with `source = "product_mockups"` and standardizing metrics like time-to-first-scheduled-campaign and weekly active planner users.
+  - Next: align event names with Analytics v2, update the experiments doc to reference these metrics explicitly, and then translate this into actual dashboards once events are wired.
+- Notes (2026-02-13, heartbeat 10, @product-ux):
+  - Created `/mayagen/reports/product-mockups-mockup-to-campaign-planner-multilingual-ux-v2.md`, a focused spec for the planner + scheduler + multilingual parts of the Product Mockups → Campaign Mode funnel, optimized for "mockup → ads → scheduled campaign in ~5–10 minutes".
+  - Clarified the Campaign Mode planner surface (scoped 7–10 day view, single **Schedule this campaign** CTA, base-post + grouped language-variants model) and made multilingual an optional reach upgrade via a constrained `+ Add language` flow and language review modal, so the calendar stays tidy even with multiple languages.
+  - Next: collaborate with design/implementation on Campaign Mode planner mocks using this spec and align analytics naming with Analytics v2 so we can track time-to-first-scheduled-campaign and multilingual adoption specifically from the Product Mockups funnel.
+- Notes (2026-02-13, heartbeat 11, @product-ux):
+  - Created `/mayagen/reports/product-mockups-campaign-mode-planner-ux-v3.md`, refining the first-time user experience of Campaign Mode when entered from Product Mockups into a short, guided "step 3 of 3" with a persistent header/stepper, simplified campaign-scoped view, single `Schedule this campaign` CTA, and a light checklist.
+  - Specified concrete UI behaviors for grouped base-post + language-variant tiles, an optional `+ Add language` flow that feels like a small reach upgrade rather than extra work, and a full-screen confirmation layer with clear next steps so the campaign feels real and revisitable.
+  - Next: work with design to translate this v3 spec into Figma mocks for first-run Campaign Mode (header, checklist, multilingual badges, confirmation) and then validate via analytics (time-to-scheduled-campaign, checklist completion, multilingual adoption) once implemented.
+- Notes (2026-02-13, heartbeat 12, @seo-growth):
+  - Created `/mayagen/reports/product-mockups-campaign-archetypes-and-templates-v1.md`, defining 3–4 concrete campaign archetypes (launch week, evergreen offer, SaaS feature launch, seasonal sale) and mapping each to a small, time-bounded planner template.
+  - Connected Product Mockups to planner templates explicitly: mockup completion now leads into archetype selection → pre-filled Campaign Mode view with 7–14 day plans and a single `Schedule this campaign` CTA, plus multilingual as an optional reach upgrade (1–3 extra languages, grouped variants).
+  - This operationalizes earlier UX specs into opinionated defaults for what *to schedule* once assets exist, and ties Product Mockups directly into the weekly habit story (post-campaign nudges to reuse best-performing posts and duplicate templates).
+  - Next: align these archetypes with the central experimentation backlog (e.g., which archetype templates to show first by segment) and with Analytics v2 dashboard work so we can compare performance and retention by archetype.
+- Notes (2026-02-13, heartbeat 13, @product-ux):
+  - Created `/mayagen/reports/product-mockups-vs-logo-maker-campaign-planner-ux-alignment-v1.md`, aligning the planner + multilingual UX for Logo Maker’s Launch Week flow and Product Mockups’ Campaign Mode so that users learn one consistent pattern for "step 3 of 3" scheduling.
+  - Standardized the header + stepper, guided checklist, single campaign-level CTA, multilingual `+ Add language` flow, and grouped language-variant model across both flows, and defined shared analytics events (with `source = "logo_maker" | "product_mockups"`) to compare friction and time-to-scheduled-campaign.
+  - Next: work with design/engineering to implement these as shared components (header, stepper, checklist, language modal, confirmation layer) and ensure both Logo Maker and Product Mockups guided modes adopt the same defaults for 7-day scoped views and multilingual as a small, optional reach upgrade.
+- Notes (2026-02-13, heartbeat 14, @seo-growth):
+  - Created `/mayagen/reports/product-mockups-funnel-experiments-v2.md`, updating the Product Mockups experiment suite to be explicitly aligned with the Analytics & Metrics v1 spec (events, properties, and dashboard views).
+  - For Experiments A–E, bound each hypothesis to concrete Analytics v2 events (e.g., `product_mockups_landing_viewed`, `campaign_wizard_opened_from_product_mockups`, `campaign_scheduled_from_product_mockups`, `campaign_scheduled_multilingual_from_product_mockups`, `user_weekly_active_planner_from_product_mockups`) and called out primary metrics, guardrails, and how they roll up into the weekly planner-habit north star.
+  - This makes Product Mockups feel like a first-class campaign source in the experimentation backlog, removes ambiguity for implementation/analytics, and keeps the free-tool → planner → scheduler → weekly habit story consistent with Logo Maker and Meme Generator.
+---
+
+## TASK: Weekly Content Pack Experiment
+- ID: task-005
+- Status: active
+- Owners: @growth, @content-lead
+- Created: 2026-02-13
+- Context:
+  - Idea from Growth v2: weekly auto-generated content packs to drive retention & referrals
+- Subtasks:
+  - [x] Define minimum viable "content pack" for Mayagen (memes + posts + mockups?)
+  - [x] Specify UX entry point (after signup? via email? inside dashboard?)
+  - [x] Draft first email/in-app copy for this flow
+- Links:
+  - Growth v2: `/mayagen/reports/growth-strategy-v2.md`
+  - Spec v1: `/mayagen/reports/weekly-content-pack-experiment-spec-v1.md`
+  - Copy v1: `/mayagen/reports/weekly-content-pack-experiment-copy-v1.md`
+  - Microcopy v1: `/mayagen/reports/weekly-content-pack-microcopy-v1.md`
+  - Email & in-app sequence v1: `/mayagen/reports/weekly-content-pack-experiment-email-sequence-v1.md`
+  - Email & in-app sequence v2: `/mayagen/reports/weekly-content-pack-experiment-email-sequence-v2.md`
+  - Surface & messaging matrix v1: `/mayagen/reports/weekly-content-pack-experiment-surface-matrix-v1.md`
+- Notes (2026-02-13, heartbeat 1, @content-lead):
+  - Moved from INBOX → ACTIVE as a shared @growth, @content-lead initiative.
+  - Created `/mayagen/reports/weekly-content-pack-experiment-spec-v1.md`, defining the MVP content pack, UX entry points (in-app, email, dashboard), and first-pass copy for email + in-product messaging.
+  - Marked initial subtasks as complete at the spec + copy-draft level; next: coordinate with @product-ux and @growth to translate this into concrete flows and experiments once SK prioritizes it.
+- Notes (2026-02-13, heartbeat 2, @content-lead):
+  - Created `/mayagen/reports/weekly-content-pack-experiment-copy-v1.md`, refining the core value proposition and drafting segmented copy variants (new/activated, inconsistent, and power users) across email, in-app banners, dashboard nudges, and planner states.
+  - Tightened suite messaging so every surface reinforces "create → plan → schedule" and positions 100+ languages as optional reach (1–2 extra languages) with grouped variants rather than complexity.
+  - Next: once concrete UX flows and Figma mocks exist, iterate on microcopy (tooltips, empty states, error states) using this doc as the source of truth and coordinate with @growth on experiments for subject lines and in-app CTAs.
+- Notes (2026-02-13, heartbeat 3, @content-lead):
+  - Created `/mayagen/reports/weekly-content-pack-experiment-copy-v2.md`, tightening v1 into implementation-ready blocks and a simple surface matrix (dashboard, planner empty state, email, planner hints, and pack-generated state).
+  - Standardized the Weekly Content Pack messaging around the suite spine — **create → plan → schedule** — and made the 100+ languages story reusable across Meme Generator, Logo Maker, Product Mockups, and planner surfaces.
+  - Next: once UX flows and experimentation priorities are locked, reuse v2 as the canonical messaging source for wiring in-app banners, planner states, and email variants, and coordinate with @growth on which segments/surfaces to light up first.
+- Notes (2026-02-13, heartbeat 4, @content-lead):
+  - Created `/mayagen/reports/weekly-content-pack-microcopy-v1.md`, defining implementation-ready microcopy for dashboard banners, planner empty states, pack detail view, multilingual controls, scheduling flows, confirmations, and email snippets.
+  - Tightened language around the suite spine — **create → plan → schedule** — and made 100+ languages feel like an optional reach boost (1–3 extra languages, grouped variants) instead of required complexity across all Weekly Content Pack surfaces.
+  - Next: once UX flows and Figma mocks are in place, use this microcopy doc as the source of truth for final text in the app and emails, and coordinate with @growth on which surfaces to light up first for the experiment.
+- Notes (2026-02-13, heartbeat 5, @content-lead):
+  - Created `/mayagen/reports/weekly-content-pack-experiment-email-sequence-v1.md`, an email + in-app sequence that keeps the Weekly Content Pack story anchored on **create → plan → schedule** and makes 100+ languages feel like a small reach upgrade (1–3 extra languages, grouped variants) instead of calendar chaos.
+  - Updated task links to include the new sequence doc so growth and implementation can wire lifecycle emails and in-app surfaces (dashboard, planner empty state, planner "pack ready" state, multilingual hints) from a single source of truth.
+  - Next: once lifecycle triggers and segments are finalized with @growth, adapt this v1 into concrete variants per segment (new/low activity, inconsistent, power users) and feed subject line and CTA tests into the experimentation backlog.
+- Notes (2026-02-13, heartbeat 6, @content-lead):
+  - Created `/mayagen/reports/weekly-content-pack-experiment-email-sequence-v2.md`, segmenting the Weekly Content Pack sequence for new/low-activity, inconsistent, and power users while keeping the spine **create → plan → schedule** and the 100+ languages story consistent (1–3 extra languages, grouped variants, tidy calendar).
+  - Updated task links to include v2 so growth, UX, and implementation can wire lifecycle triggers, in-app banners, planner hints, and multilingual prompts from a single, segment-aware source of truth.
+  - Next: once lifecycle triggers/segments are locked with @growth, adapt v2 into concrete experiment variants (subject lines, CTAs, and surface order) and align with planner/analytics events so we can measure impact on time-to-first-scheduled-week and multilingual adoption.
+- Notes (2026-02-13, heartbeat 7, @content-lead):
+  - Created `/mayagen/reports/weekly-content-pack-experiment-surface-matrix-v1.md`, defining a structural matrix for all Weekly Content Pack surfaces (dashboard, planner empty state, pack detail, planner pack-loaded state, confirmation) so every touchpoint tells the same **create → plan → schedule** story and treats 100+ languages as a small, optional reach upgrade (1–3 extra languages, grouped variants, tidy calendar).
+  - Updated Links for this task to include the new surface/messaging matrix and aligned it with existing copy/microcopy/sequence docs, so growth, UX, and implementation can wire in-app and email surfaces from a single, consistent messaging map.
+  - Next: once lifecycle triggers, segments, and concrete UX flows are locked, use this matrix to (a) validate each surface against the suite spine and multilingual framing, and (b) derive experiment variants for CTAs and emphasis without diverging from the core story.
